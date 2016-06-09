@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8" />
+  <title>Класс</title>
+  <script src="HashStorage.js"></script>
+ </head>
+ <body>
+ <div id="result">Здесь будет текст</div>
+ <div id="inputs">
+ <ul>
+   <li><input id="addDrink" type="button" value="Ввод информации о напитке" onclick="addDrink()"></li>
+   <li><input id="drinkInfo" type="button" value="Получение информации о напитке" onclick="drinkInfo()"></li>
+   <li><input id="delDrink" type="button" value="Удаление информации о напитке" onclick="delDrink()"></li>
+   <li><input id="allDrink" type="button" value="Перечень всех напитков" onclick="allDrink()"></li>
+ </ul>
+  </div>
+   <style>
+    #result{
+      width: 60%;
+      background: yellow;
+      padding: 5px;
+      border: solid 2px red;
+      float: left;
+      height: 300px;
+      text-align: center;
+      color: blue;
+      font-size: 20px;
+      border-radius: 12px;
+    }
+    #inputs{
+      width: 38%;
+      float: right;
+    }
+    li {
+    list-style-type: none;
+    display: block;
+    height: 30px;
+   }
+    input{
+      display: inline;
+    }
+    .alert{
+      width: 60%;
+      background: yellow;
+      padding: 5px;
+      border: solid 2px red;
+      float: left;
+      height: 300px;
+      text-align: center;
+      color: blue;
+      font-size: 20px;
+      border-radius: 12px;
+    }
+   </style>
+  <script>
+    var DrinkStorage = new THashStorage();
+    function addDrink(){
+      var name = prompt("Введите название напитка");
+      if (name == null || name == "null") {return document.getElementById('result').innerHTML="Вы отменили ввод";
+      }else{
+      var alckoholick = (prompt("Алкогольный?") || "Неизвестно");
+      var recipe = (prompt("Рецепт") || "Неизвестно");
+          var value = { 'напиток' : name,
+                            'алкогольный' : alckoholick,
+                            'рецепт' : recipe}
+      return DrinkStorage.AddValue(name,value);}
+    };
+  
+    function drinkInfo(){
+      var name = prompt("Введите название напитка, который хотите найти");
+      if (name == null || name == "null") {return document.getElementById('result').innerHTML="Поиск отменён";
+      }else if(DrinkStorage.GetValue(name)===undefined){
+        return document.getElementById('result').innerHTML="Такого напитка нет в списке";
+      }
+      else{
+        var arrNew = DrinkStorage.GetValue(name);
+        return document.getElementById('result').innerHTML="напиток: " + "<strong>" + arrNew['напиток'] + "</strong>" + "</br>" + "алкогольный: " + "<strong>" + arrNew['алкогольный'] + "</strong>" + "</br>" + "рецепт: " + "<strong>" + arrNew['рецепт'] + "</strong>";
+      }
+    };
+  
+    function delDrink(){
+      var name = prompt("Какой напиток удалить?");
+      if (name == null || name == "null") {return document.getElementById('result').innerHTML="Удаление отменено";
+      } else if(DrinkStorage.GetValue(name)){
+        DrinkStorage.DeleteValue(name);
+        return document.getElementById('result').innerHTML="напиток "+ "<strong>" +name+ "</strong>" + " удалён из списка";
+      }else{
+        return document.getElementById('result').innerHTML="напитка "+"<strong>" +name+ "</strong>"+" нет в списке";
+      }
+    };
+  
+    function allDrink(){
+      return document.getElementById('result').innerHTML="<strong>" +DrinkStorage.getKeys()+"</strong>";
+    };
+
+  </script>
+ </body>
+</html>
