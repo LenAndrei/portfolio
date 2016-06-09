@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>My Time</title>
+</head>
+<body>
+	<script>
+
+	document.body.style.margin = 0;
+	document.body.style.padding = 0;
+
+		function createClock(){ //функция создаёт элементы часов и задаёт им css свойства
+			// создание циферблата
+			var div = document.createElement('div');
+			div.setAttribute('id','mainCircle');
+			div.style.cssText = 'position: relative; height: 700px; width: 700px; background: yellow; border-radius: 50%';
+			var hours = 12;
+			//создание циферок
+			for (var i = 1; i < hours+1; i++){
+				var div1 = document.createElement('div');
+				
+				function f(x){
+					return x;
+				}
+
+				div1.setAttribute('id','item' + f(i));
+				div1.style.cssText = 'position: absolute; height: 70px; width: 70px; background: green; border-radius: 50%; text-align: center; font-size: 50px; color: white';
+				div1.innerHTML = f(i);
+				div.appendChild(div1);
+			}
+			//создание стрелочек
+			var hands = 3;
+			for (var a = 1; a < hands+1; a++){
+				var span = document.createElement('span');
+				var handHeight = 170;
+				var handWidth = 20;
+
+				function f(x){
+					return x;
+				}
+
+				span.setAttribute('id','hand' + f(a));
+				span.style.cssText = 'position: absolute; background: black; border-radius: 25%; z-index: 100; height: ' + (handHeight + f(a)*handHeight/4) + 'px; width: ' + Math.round(handWidth/f(a)) + 'px';
+				div.appendChild(span);
+			}
+			//создание циферблата
+			var span1 = document.createElement('span');
+			span1.setAttribute('id','clockFace');
+			span1.style.cssText = 'position: absolute; height: 45px; width: 200px; background: white; border-radius: 15%; color: green; font-size: 40px; text-align: center';
+			div.appendChild(span1);
+
+			return div;
+		};
+
+		document.body.appendChild(createClock());
+
+		function positionElems(){  //располагает элементы часов
+			//расположение центра
+			var div = document.getElementById('mainCircle');
+			var divCenterX = div.offsetLeft + div.offsetWidth/2;
+			var divCenterY = div.offsetTop + div.offsetHeight/2;
+			var angel = 30;                                    // каждое деление составляет углу в 30 градусов
+			//располагает кругляшки с циферками
+			var hours = 12;
+			for (var i = 1; i < hours+1; i++){
+				
+				function f(x){
+					return x;
+				}
+
+				var div1 = document.getElementById('item' + f(i));
+				var radius = div.offsetWidth/2 - div1.offsetWidth;
+				var newAngel = angel/180*Math.PI*f(i);
+				var div1X=divCenterX+radius*Math.sin(newAngel);
+        var div1Y=divCenterY-radius*Math.cos(newAngel);
+        div1.style.left = Math.round(div1X - div1.offsetWidth/2) + 'px';
+        div1.style.top = Math.round(div1Y - div1.offsetHeight/2) + 'px';
+			}
+			//располагает стрелочки
+			var hands = 3; // 3 стрелки: часовая, минутная, секундная
+			for (var a = 1; a < hands+1; a++){
+
+				function f(x){
+					return x;
+				}
+
+				var span = document.getElementById('hand' + f(a));
+				var spanCenterX = span.offsetWidth/2;
+				var cordX = divCenterX - spanCenterX;
+				var cordY = divCenterY - (span.offsetHeight*9/10);
+				span.style.top = cordY + 'px';
+				span.style.left = cordX + 'px';
+				span.style.transformOrigin = ' 50% 90%';
+			}
+			//расположение циферблата(электронных часов)
+				var span1 = document.getElementById('clockFace');
+				var span1CenterY = span1.offsetHeight/2;
+				var span1CenterX = span1.offsetWidth/2;
+				var heightTillClockFace = 150;
+				span1.style.top = (divCenterY - heightTillClockFace - span1CenterY ) + 'px';
+				span1.style.left = (divCenterX - span1CenterX ) + 'px';
+		};
+
+		function update(){
+			var currentTime = new Date();
+			var current = editTime(currentTime).str;
+			document.getElementById("clockFace").innerHTML = current;
+
+			if(editTime(currentTime).hours > 12){
+				var degreeHours = (editTime(currentTime).hours-12)*360/(12);
+			}else{
+			var degreeHours = editTime(currentTime).hours*360/(12);
+			}
+			var degreeMinutes = editTime(currentTime).minutes*360/(60);
+			var degreeSeconds = editTime(currentTime).seconds*360/(60);
+
+			var handHours = document.getElementById('hand1');
+			handHours.style.transform = 'rotate(' + degreeHours + 'deg)';
+			
+
+			var handMinutes = document.getElementById('hand2');
+			handMinutes.style.transform = 'rotate(' + degreeMinutes + 'deg)';
+
+			var handSeconds = document.getElementById('hand3');
+			handSeconds.style.transform = 'rotate(' + degreeSeconds + 'deg)';
+		}
+
+		function editTime(DT){
+			var Hours = DT.getHours();
+			var Minutes = DT.getMinutes();
+			var Seconds = DT.getSeconds();
+			return {str:toStr(Hours,2) + ':' +  toStr(Minutes,2) + ':' + toStr(Seconds,2),
+							hours: Hours,
+							minutes: Minutes,
+							seconds: Seconds};
+		}
+
+		function toStr(val, len){
+			var strVal = val.toString();
+			while ( strVal.length < len ){
+				strVal = '0' + strVal;
+			}
+			return strVal;
+		}
+
+		update();
+		positionElems();
+		setInterval(update, 500);
+
+
+	</script>
+</body>
+</html>
