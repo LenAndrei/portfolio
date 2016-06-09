@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8" />
+  <title>Видео</title>
+ </head>
+ <body>
+  <script>
+      function RandomDiap(N,M)
+    {
+        return Math.floor(Math.random()*(M-N+1))+N;
+    };
+
+    function Mood(ColorsCount)
+    {
+        var ColorsA=[ '', 'красный', 'оранжевый', 'жёлтый', 'зелёный', 'голубой', 'синий', 'фиолетовый' ];
+
+        console.log( 'цветов: ' + ColorsCount );
+        var H={};
+        for ( var i=1; i<=ColorsCount; i++ )
+        {do{
+            var N=RandomDiap(1,7);
+            var ColorName=ColorsA[N];}
+        while (N in H);
+            H[N] = 'true';
+            console.log( ColorName );
+          }
+    }
+    Mood(5);
+  </script>
+ </body>
+</html>
