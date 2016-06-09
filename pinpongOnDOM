@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Pong DOM</title>
+</head>
+<body>
+	<script>
+		document.body.style.margin = 0;
+		document.body.style.padding = 0;
+
+		var startButton;
+		var game;
+		var player1;
+		var player2;
+		var scoreShow;
+		var ball;
+		var myInterval;
+
+		function createField(){
+			var mainDiv = document.createElement('div');
+			mainDiv.style.cssText = 'width: 800px; height: 760px; background-color: white; position: relative';
+			mainDiv.setAttribute("id", "mainDiv");
+			document.body.appendChild(mainDiv);
+
+			//поле
+			var gameH = {
+				"x" : 0,
+				"y" : 150,
+				"width" : 790,
+				"height" : 600,
+				"color" : "yellow",
+				"id" : "game",
+				"zIndex" : "2",
+				"borderWidth" : 5,
+				"borderColor" : "black",
+				"borderRadius" : "0%",
+				"borderStyle" : "solid"
+			}
+			game = new rect(gameH);
+			game.createEl();
+			//ракетки
+			var player1H = {
+				"x" : 5,
+				"y" : 375,
+				"width" : 20,
+				"height" : 150,
+				"color" : "green",
+				"id" : "player1",
+				"zIndex" : "3",
+				"borderWidth" : 0,
+				"borderColor" : "green",
+				"borderRadius" : "0%",
+				"borderStyle" : "solid"
+			}
+			player1 = new rect(player1H);
+			player1.createEl();
+
+			var player2H = {
+				"x" : 775,
+				"y" : 375,
+				"width" : 20,
+				"height" : 150,
+				"color" : "blue",
+				"id" : "player2",
+				"zIndex" : "3",
+				"borderWidth" : 0,
+				"borderColor" : "blue",
+				"borderRadius" : "0%",
+				"borderStyle" : "solid"
+			}
+			player2 = new rect(player2H);
+			player2.createEl();
+			//начальные очки
+			player1.scores = 0;
+			player2.scores = 0;
+			player1.vY = 0;
+			player2.vY = 0;
+			//мяч
+			var ballH = {
+				"x" : 380,
+				"y" : 430,
+				"width" : 40,
+				"height" : 40,
+				"color" : "red",
+				"id" : "ball",
+				"zIndex" : "3",
+				"borderWidth" : 0,
+				"borderColor" : "red",
+				"borderRadius" : "50%",
+				"borderStyle" : "solid"
+			}
+			ball = new rect(ballH);
+			ball.createEl();
+			ball.vX = 2;
+			ball.vY = 2;
+			var bl = document.getElementById("ball");
+			bl.style.display = 'none';
+			//кнопка старт
+			var startButtonH = {
+				"x" : 20,
+				"y" : 40,
+				"width" : 90,
+				"height" : 30,
+				"color" : "grey",
+				"id" : "startButton",
+				"zIndex" : "3",
+				"borderWidth" : 0,
+				"borderColor" : "grey",
+				"borderRadius" : "0%",
+				"borderStyle" : "solid"
+			}
+			startButton = new rect(startButtonH);
+			startButton.createEl();
+
+			var stButt = document.getElementById("startButton");
+			stButt.innerHTML = "Старт!";
+			stButt.style.color = 'black';
+			stButt.style.fontSize = '30px';
+			stButt.style.padding = '20px';
+
+			//счёт
+			var countH = {
+				"x" : 320,
+				"y" : 30,
+				"width" : 135,
+				"height" : 110,
+				"color" : "white",
+				"id" : "count",
+				"zIndex" : "3",
+				"borderWidth" : 0,
+				"borderColor" : "white",
+				"borderRadius" : "0%",
+				"borderStyle" : "solid"
+			}
+			count = new rect(countH);
+			count.createEl();
+
+			var ct = document.getElementById("count");
+			ct.innerHTML = player1.scores + ":" + player2.scores;
+			ct.style.color = 'black';
+			ct.style.fontSize = '100px';
+
+			addEventListener("keydown", movePlayers, false);
+			addEventListener("keyup", stopPlayers, false);
+			stButt.addEventListener("click", start);
+		}
+
+
+		function rect(objA){
+			var self = this;
+	  		self.x = objA.x;
+	  		self.y = objA.y;
+	  		self.width = objA.width;
+	  		self.height = objA.height;
+	  		self.color = objA.color;
+	  		self.id = objA.id;
+	  		self.zIndex = objA.zIndex;
+	  		self.borderWidth = objA.borderWidth;
+	  		self.borderColor = objA.borderColor;
+	  		self.borderRadius = objA.borderRadius;
+	  		self.borderStyle = objA.borderStyle;
+	  		self.createEl = function(){
+	  			var mainDiv = document.getElementById('mainDiv');
+	  			var crElem = document.createElement('div');
+	  			crElem.style.cssText = 'position: absolute; left:' + self.x + 'px; top:' + self.y + 'px; width:' + self.width + 'px; height:' + self.height + 'px; background-color:' +  self.color + '; z-index:' + self.zIndex + '; border-width:' + self.borderWidth + 'px ; border-radius:' + self.borderRadius + '; border-color:' + self.borderColor + '; border-style:' + self.borderStyle;
+	  			crElem.setAttribute('id', self.id);
+	  			mainDiv.appendChild(crElem);
+	  		}
+	  		self.showEl = function(){
+	  			var El = document.getElementById(this.id);
+		  			El.style.top = (this.y + 'px');
+		  			El.style.left = (this.x + 'px');
+	  		}
+  	}
+
+  	function play(){
+  		draw();
+  		update();
+  	}
+
+  	function draw(){
+  		if(!ball.hiden){
+  			var bl = document.getElementById("ball");
+				bl.style.display = 'block';
+  		}
+  		ball.showEl();
+  		player2.showEl();
+  		player1.showEl();
+  		var sco = document.getElementById("count");
+  		sco.innerHTML = player1.scores + ":" + player2.scores;
+
+  		if(player1.stopInterval || player2.stopInterval){
+  			clearInterval(myInterval);
+  		}
+  	}
+
+  	function update(){
+  		ball.x += ball.vX;
+  		ball.y += ball.vY;
+  		player1.y +=player1.vY;
+  		player2.y +=player2.vY;
+  		//соприкосновение с горизонтальными стенками
+  		  if (ball.y < game.y + game.borderWidth || ball.y + ball.height>game.y + game.height + game.borderWidth){
+  		    ball.vY = -ball.vY;
+  		  }
+  		  //соприкосновение с левой стенкой
+  		  if(ball.x<game.borderWidth){
+  		    ball.vX = -ball.vX;
+  		    player2.scores ++;
+  		    player2.stopInterval = true;
+  		  }
+  		  //соприкосновение с правой стенкой
+  		  if(ball.x + ball.width>game.x + game.width + game.borderWidth){
+  		    ball.vX = -ball.vX;
+  		    player1.scores ++;
+  		   	player1.stopInterval = true;
+  		  }
+  		  //столкновение с ракетками
+  		  if((collision(player1, ball)&&ball.vX<0)||(collision(player2, ball)&&ball.vX>0)){ball.vX=-ball.vX}
+  	}
+
+      function collision(objA, objB){
+      if ((objA.x + objA.width > objB.x) && (objA.x < objB.x + objB.width) && (objA.y + objA.height > objB.y) && (objA.y < objB.y + objB.height)){ return true;}
+      else {return false;}
+    }
+
+    function start(){
+        player1.y = game.y + game.height/2 - player1.height/2;
+        player2.y = game.y + game.height/2 - player2.height/2;
+        player1.scores;
+        player2.scores;
+        startBall();
+
+      player1.stopInterval = false;
+      player2.stopInterval = false;
+      myInterval = setInterval(play, 1000/50 );
+    }
+
+    function startBall(){
+      var min = 1;
+      var max = 4;
+      ball.x = 380;
+      ball.y = 430;
+      ball.hiden = false;
+
+      var rand = Math.round(min - 0.5 + Math.random() * (max - min + 1));
+      if ( rand == 1) 
+        {ball.vX = -2;
+          ball.vY = 2;
+        }
+      if ( rand == 2) 
+        {ball.vX = -2;
+          ball.vY = -2;
+        }
+      if ( rand == 3) 
+        {ball.vX = 2;
+          ball.vY = -2;
+        }
+      if ( rand == 4) 
+        {ball.vX = 2;
+          ball.vY = 2;
+        }
+
+    }
+
+    function movePlayers(event){
+    	if (event.keyCode == 17){
+    		if (player1.y < game.y + game.height - player1.height + game.borderWidth){
+    			player1.vY = 2;		    		
+    		} else {
+    			player1.vY = 0;
+    		}
+    	}
+    	if (event.keyCode == 40){
+    		if (player2.y < game.y + game.height - player2.height + game.borderWidth){
+    			player2.vY = 2;		    		
+    		} else {
+    			player2.vY = 0;
+    		}
+    	}
+    	if (event.keyCode == 16){
+    		event.stopPropagation();
+    		if(player1.y > game.y + game.borderWidth){
+    			player1.vY = -2;
+    		} else {
+    			player1.vY = 0;
+    		}
+    	}
+	    if (event.keyCode == 38){
+	    	if(player2.y > game.y + game.borderWidth){
+	    		player2.vY = -2;
+	    	} else {
+	    		player2.vY = 0;
+	    	}
+	    }
+    }  
+
+    function stopPlayers(event){
+  		    if (event.keyCode == 40 || event.keyCode == 38){
+  		    	player2.vY = 0;
+  		    }
+  		    if (event.keyCode == 17 || event.keyCode == 16){
+  		    	player1.vY = 0;
+  		    }
+    }  
+
+  	createField();
+	</script>
+</body>
+</html>
