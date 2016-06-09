@@ -1,0 +1,24 @@
+        function THashStorage(){
+      var self = this;
+      var repository = {};
+
+      self.Reset = function(){
+          repository = {};
+        };
+
+      self.AddValue = function(key, value){
+          repository[key] = value;
+        };
+
+      self.GetValue = function(key){
+          return repository[key];
+        };
+
+      self.DeleteValue = function(key){
+          delete repository[key];
+        };
+
+      self.getKeys = function() {
+        return Object.keys(repository);
+      };
+    };
